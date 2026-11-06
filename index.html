@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="A simple mini-bike speed calculator. Estimate speed from engine RPM, sprocket sizes, and tire diameter.">
+  <title>Z's Mini Bike Speed Calculator</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --background: #1e1e1e;
+      --panel: #2b2b2b;
+      --red: #ff3333;
+      --white: #ffffff;
+      --muted: #b8b8b8;
+      --border: #444444;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      padding: 32px 16px;
+      display: grid;
+      place-items: center;
+      background:
+        radial-gradient(circle at top, rgba(255, 51, 51, 0.10), transparent 34rem),
+        var(--background);
+      color: var(--white);
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    .calculator {
+      width: min(100%, 480px);
+      padding: 30px;
+      background: #242424;
+      border: 1px solid var(--border);
+      border-top: 4px solid var(--red);
+      border-radius: 14px;
+      box-shadow: 0 18px 55px rgba(0, 0, 0, 0.4);
+    }
+
+    .eyebrow {
+      margin: 0 0 8px;
+      color: var(--red);
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: clamp(1.45rem, 5vw, 1.9rem);
+      line-height: 1.2;
+      color: var(--red);
+    }
+
+    .intro {
+      margin: 0 0 26px;
+      color: var(--muted);
+      font-size: 0.92rem;
+      line-height: 1.5;
+    }
+
+    .field { margin: 0 0 17px; }
+
+    label {
+      display: block;
+      margin-bottom: 7px;
+      font-size: 0.92rem;
+      font-weight: 700;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px 13px;
+      border: 1px solid #505050;
+      border-radius: 7px;
+      outline: none;
+      background: var(--panel);
+      color: var(--white);
+      font: inherit;
+      transition: border-color 150ms ease, box-shadow 150ms ease;
+    }
+
+    input:focus {
+      border-color: var(--red);
+      box-shadow: 0 0 0 3px rgba(255, 51, 51, 0.16);
+    }
+
+    input::placeholder { color: #888888; }
+
+    button {
+      width: 100%;
+      margin-top: 5px;
+      padding: 13px 16px;
+      border: 0;
+      border-radius: 7px;
+      background: var(--red);
+      color: var(--white);
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 120ms ease, filter 120ms ease;
+    }
+
+    button:hover { filter: brightness(1.12); }
+    button:active { transform: translateY(1px); }
+    button:focus-visible { outline: 3px solid white; outline-offset: 3px; }
+
+    .results {
+      margin-top: 22px;
+      padding: 17px;
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      background: var(--panel);
+    }
+
+    .results h2 {
+      margin: 0 0 12px;
+      color: var(--red);
+      font-size: 1rem;
+    }
+
+    .result-line {
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 8px 0;
+      border-bottom: 1px solid #414141;
+      color: #dddddd;
+      font-size: 0.93rem;
+    }
+
+    .result-line:last-child { border-bottom: 0; }
+
+    .result-line strong {
+      color: var(--white);
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .result-line.speed {
+      margin-top: 5px;
+      padding-top: 13px;
+      font-size: 1.05rem;
+    }
+
+    .result-line.speed strong {
+      color: var(--red);
+      font-size: 1.2rem;
+    }
+
+    .message {
+      min-height: 1.2em;
+      margin: 12px 0 0;
+      color: #ff8585;
+      font-size: 0.88rem;
+      line-height: 1.4;
+    }
+
+    .footnote {
+      margin: 18px 0 0;
+      color: #929292;
+      font-size: 0.78rem;
+      line-height: 1.5;
+      text-align: center;
+    }
+
+    @media (max-width: 420px) {
+      .calculator { padding: 23px 19px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="calculator">
+    <p class="eyebrow">Z's Custom Garage</p>
+    <h1>MINI BIKE SPEED CALCULATOR</h1>
+    <p class="intro">Enter your engine and drivetrain details to estimate your mini-bike's speed.</p>
+
+    <form id="calculator-form">
+      <div class="field">
+        <label for="rpm">Engine RPM</label>
+        <input id="rpm" name="rpm" type="number" min="0" step="1" placeholder="Example: 3600" required>
+      </div>
+
+      <div class="field">
+        <label for="clutch">Clutch sprocket (teeth)</label>
+        <input id="clutch" name="clutch" type="number" min="0" step="1" placeholder="Example: 12" required>
+      </div>
+
+      <div class="field">
+        <label for="rear">Rear sprocket (teeth)</label>
+        <input id="rear" name="rear" type="number" min="0" step="1" placeholder="Example: 75" required>
+      </div>
+
+      <div class="field">
+        <label for="tire">Tire diameter (inches)</label>
+        <input id="tire" name="tire" type="number" min="0" step="any" placeholder="Example: 13" required>
+      </div>
+
+      <button type="submit">CALCULATE SPEED</button>
+    </form>
+
+    <section class="results" aria-live="polite" aria-atomic="true">
+      <h2>Calculation Results</h2>
+      <div class="result-line"><span>Gear Ratio</span><strong id="ratio-result">—</strong></div>
+      <div class="result-line"><span>Wheel RPM</span><strong id="wheel-result">—</strong></div>
+      <div class="result-line speed"><span>Estimated Speed</span><strong id="speed-result">— MPH</strong></div>
+      <p class="message" id="message"></p>
+    </section>
+
+    <p class="footnote">Estimates theoretical speed. Actual speed can vary with engine load, tire size, rider weight, terrain, and other conditions.</p>
+  </main>
+
+  <script>
+    const form = document.getElementById("calculator-form");
+    const ratioResult = document.getElementById("ratio-result");
+    const wheelResult = document.getElementById("wheel-result");
+    const speedResult = document.getElementById("speed-result");
+    const message = document.getElementById("message");
+
+    form.addEventListener("submit", function (event) {
+      event.preventDefault();
+
+      const rpm = Number(document.getElementById("rpm").value);
+      const clutch = Number(document.getElementById("clutch").value);
+      const rear = Number(document.getElementById("rear").value);
+      const tire = Number(document.getElementById("tire").value);
+
+      if (![rpm, clutch, rear, tire].every(Number.isFinite) ||
+          rpm <= 0 || clutch <= 0 || rear <= 0 || tire <= 0) {
+        message.textContent = "Invalid input. Please enter positive numbers in all four fields.";
+        ratioResult.textContent = "—";
+        wheelResult.textContent = "—";
+        speedResult.textContent = "— MPH";
+        return;
+      }
+
+      const ratio = rear / clutch;
+      const wheelRpm = rpm / ratio;
+      const circumference = tire * 3.14159;
+      const inchesPerMinute = wheelRpm * circumference;
+      const mph = inchesPerMinute * 60 / 63360;
+
+      ratioResult.textContent = ratio.toFixed(2) + ":1";
+      wheelResult.textContent = wheelRpm.toFixed(1);
+      speedResult.textContent = mph.toFixed(1) + " MPH";
+      message.textContent = "";
+    });
+  </script>
+</body>
+</html>
